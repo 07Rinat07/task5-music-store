@@ -3,21 +3,48 @@
 {% block title %}Song Details{% endblock %}
 
 {% block body %}
-    <div class="container" style="max-width: 800px; margin-top: 40px;">
-        <a href="/" style="display:inline-block;margin-bottom:20px;">← Back to list</a>
+    <div class="container" style="max-width: 700px; margin-top: 40px;">
 
-        <h1>Song Details</h1>
+        <a href="/" style="
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 8px 14px;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        ">
+            ← Back to Songs
+        </a>
 
-        <div id="detailsContainer">
-            <p>Loading...</p>
+        <h1>Song #{{ index }}</h1>
+
+        <div id="songDetails">
+            Loading...
         </div>
     </div>
 
-    <script src="/js/song_details.js"></script>
-
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            loadSongDetails({{ index }});
-        });
+        async function loadSong() {
+            const res = await fetch("/api/songs/details/{{ index }}");
+            const data = await res.json();
+
+            document.getElementById('songDetails').innerHTML = `
+                <h2>${data.title}</h2>
+
+                <img src="${data.coverUrl}" width="300"
+                     style="margin: 20px 0; border-radius: 10px; display: block;">
+
+                <p><b>Artist:</b> ${data.artist}</p>
+                <p><b>Album:</b> ${data.album}</p>
+                <p><b>Genre:</b> ${data.genre}</p>
+                <p><b>Review:</b> ${data.review}</p>
+
+                <h3>Audio Preview</h3>
+                <audio controls src="${data.audioUrl}" style="width: 100%;"></audio>
+            `;
+        }
+
+        document.addEventListener("DOMContentLoaded", loadSong);
     </script>
 {% endblock %}
