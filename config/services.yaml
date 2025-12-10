@@ -1,30 +1,17 @@
-parameters: { }
-
 services:
     _defaults:
         autowire: true
         autoconfigure: true
 
-    # Подключаем весь src как сервисы
     App\:
         resource: '../src/'
         exclude:
-            - '../src/DependencyInjection/'
-            - '../src/Entity/'
             - '../src/Kernel.php'
 
-    # Контроллеры
-    App\Controller\:
-        resource: '../src/Controller/'
-        tags: ['controller.service_arguments']
-
-    # LocaleDataProvider требует аргумент projectDir
     App\Service\SongGenerator\LocaleDataProvider:
         arguments:
             $projectDir: '%kernel.project_dir%'
 
-    # AudioClient — временный mock
     App\Service\Audio\AudioClient:
         arguments:
             $baseUrl: 'http://localhost:4000'
-

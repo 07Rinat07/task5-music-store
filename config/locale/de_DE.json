@@ -1,4 +1,9 @@
 {
+  "locale": "de_DE",
+  "seed": 91244577,
+  "avgLikes": 3.6,
+  "songsCount": 100,
+
   "titles": [
     "Verlorene Erinnerungen",
     "Goldener Horizont",
@@ -11,6 +16,7 @@
     "Neonherz",
     "Gebrochene Symphonie"
   ],
+
   "artists": [
     "Aurora Himmel",
     "Mond Echo",
@@ -23,6 +29,7 @@
     "Kristallschatten",
     "Samtiger Ton"
   ],
+
   "albums": [
     "Echos von Morgen",
     "Aufstieg der Nacht",
@@ -35,6 +42,7 @@
     "Jenseits der Unendlichkeit",
     "Stilles Universum"
   ],
+
   "genres": [
     "Synthwave",
     "Pop",
@@ -47,6 +55,7 @@
     "Lo-Fi",
     "Metal"
   ],
+
   "reviews": [
     "Ein wirklich emotionales Erlebnis.",
     "Starker Rhythmus und tolle Produktion.",

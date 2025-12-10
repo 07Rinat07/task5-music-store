@@ -1,17 +1,62 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
-        {% block stylesheets %}
-        {% endblock %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-        {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
-        {% endblock %}
-    </head>
-    <body>
-        {% block body %}{% endblock %}
-    </body>
+    <title>{% block title %}Music Store{% endblock %}</title>
+
+    {% block stylesheets %}
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background: #f5f5f5;
+                margin: 0;
+                padding: 0;
+            }
+
+            .container {
+                background: white;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                margin: 40px auto;
+                max-width: 900px;
+            }
+
+            .song-card {
+                padding: 15px;
+                margin: 10px 0;
+                border: 1px solid #ddd;
+                border-radius: 6px;
+                background: #fafafa;
+            }
+
+            button {
+                cursor: pointer;
+                background: #007bff;
+                color: white;
+                border: none;
+                padding: 8px 14px;
+                border-radius: 5px;
+            }
+
+            button:hover {
+                background: #0056b3;
+            }
+
+            hr {
+                margin: 30px 0;
+            }
+        </style>
+    {% endblock %}
+</head>
+
+<body>
+{% block body %}{% endblock %}
+
+{% block javascripts %}
+    <script src="/js/app.js"></script>
+{% endblock %}
+</body>
 </html>

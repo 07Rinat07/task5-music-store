@@ -1,4 +1,9 @@
 {
+  "locale": "en_US",
+  "seed": 58933423,
+  "avgLikes": 3.7,
+  "songsCount": 100,
+
   "titles": [
     "Lost Memories",
     "Golden Horizon",
@@ -11,6 +16,7 @@
     "Neon Heart",
     "Broken Symphony"
   ],
+
   "artists": [
     "Aurora Sky",
     "Lunar Echo",
@@ -23,6 +29,7 @@
     "Crystal Shade",
     "Velvet Noise"
   ],
+
   "albums": [
     "Echoes of Tomorrow",
     "Nightfall Rising",
@@ -35,6 +42,7 @@
     "Beyond Infinity",
     "Silent Universe"
   ],
+
   "genres": [
     "Synthwave",
     "Pop",
@@ -47,6 +55,7 @@
     "Lo-Fi",
     "Metal"
   ],
+
   "reviews": [
     "A truly emotional experience.",
     "Strong rhythm and excellent production.",

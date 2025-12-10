@@ -2,7 +2,9 @@
 
 namespace App\Service\SongGenerator;
 
-final class LocaleDataProvider
+use Symfony\Component\Filesystem\Filesystem;
+
+class LocaleDataProvider
 {
     private string $localeDir;
 
@@ -11,20 +13,24 @@ final class LocaleDataProvider
         $this->localeDir = $projectDir . '/config/locale';
     }
 
+    /**
+     * Загружает JSON-файл локали (например en_US.json)
+     */
     public function get(string $locale): array
     {
         $file = $this->localeDir . '/' . $locale . '.json';
 
         if (!file_exists($file)) {
-            throw new \RuntimeException("Locale file not found: {$file}");
+            throw new \RuntimeException("Locale file not found: $file");
         }
 
-        $json = json_decode(file_get_contents($file), true);
+        $json = file_get_contents($file);
+        $data = json_decode($json, true);
 
-        if (!is_array($json)) {
-            throw new \RuntimeException("Locale file invalid: {$file}");
+        if ($data === null) {
+            throw new \RuntimeException("Invalid JSON in locale file: $file");
         }
 
-        return $json;
+        return $data;
     }
 }
