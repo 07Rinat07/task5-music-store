@@ -1,20 +1,53 @@
-
 services:
-###> doctrine/doctrine-bundle ###
-  database:
-    image: postgres:${POSTGRES_VERSION:-16}-alpine
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB:-app}
-      # You should definitely change the password in production
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-!ChangeMe!}
-      POSTGRES_USER: ${POSTGRES_USER:-app}
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: music-store-php
+    working_dir: /var/www/html
     volumes:
-      - database_data:/var/lib/postgresql/data:rw
-      # You may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
-      # - ./docker/db/data:/var/lib/postgresql/data:rw
-###< doctrine/doctrine-bundle ###
+      - ./:/var/www/html
+    environment:
+      APP_ENV: dev
+      APP_SECRET: 10df6111a35dc2de74a4b53835f7c889
+      DATABASE_URL: "postgresql://app:!ChangeMe!@db:5432/app?serverVersion=16&charset=utf8"
+      AUDIO_SERVER_URL: "http://localhost:4000"
+    depends_on:
+      - db
+      - audio-server
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: music-store-nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./:/var/www/html:ro
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - php
+
+  db:
+    image: postgres:16-alpine
+    container_name: music-store-db
+    environment:
+      POSTGRES_DB: app
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: "!ChangeMe!"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  audio-server:
+    image: node:22-alpine
+    container_name: music-store-audio
+    working_dir: /usr/src/app
+    volumes:
+      - ./audio-server:/usr/src/app
+    command: ["sh", "-c", "npm ci && node server.js"]
+    ports:
+      - "4000:3000"
 
 volumes:
-###> doctrine/doctrine-bundle ###
-  database_data:
-###< doctrine/doctrine-bundle ###
+  db_data:

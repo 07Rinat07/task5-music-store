@@ -1,3 +1,6 @@
+parameters:
+    audio_server_base_url: '%env(AUDIO_SERVER_URL)%'
+
 services:
     _defaults:
         autowire: true
@@ -14,4 +17,4 @@ services:
 
     App\Service\Audio\AudioClient:
         arguments:
-            $baseUrl: 'http://localhost:4000'
+            $baseUrl: '%audio_server_base_url%'

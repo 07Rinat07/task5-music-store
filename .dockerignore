@@ -1,0 +1,10 @@
+.git
+.idea
+vendor
+node_modules
+var
+.symfony5
+composer.lock
+.coverage
+phpunit.xml.dist
+phpunit.xml

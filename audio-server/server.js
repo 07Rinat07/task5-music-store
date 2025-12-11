@@ -1,62 +1,76 @@
-const express = require('express');
-const cors = require('cors');
+import express from "express";
+import cors from "cors";
 
-// Детерминированный генератор случайных чисел
-function seededRandom(seed) {
-    let x = Math.sin(seed) * 10000;
-    return x - Math.floor(x);
-}
+const app = express();
+const PORT = 3000; // внутри контейнера
 
-// Генерация WAV
-function generateWavAudio(seed, index) {
-    const sampleRate = 44100;
-    const duration = 1.5; // 1.5 seconds
-    const samples = sampleRate * duration;
-    const frequency = 200 + Math.floor(seededRandom(seed + index) * 600);
+app.use(cors());
 
-    const buffer = Buffer.alloc(44 + samples * 2); // WAV header + samples
+/**
+ * Генерируем валидный WAV 16-bit PCM mono 44.1 kHz
+ * Длина ~1 секунда. Сигнал — синус с частотой, зависящей
+ * от seed и index => детерминизм.
+ */
+app.get("/audio", (req, res) => {
+    const seed  = Number(req.query.seed || 1);
+    const index = Number(req.query.index || 1);
 
-    // WAV Header
-    buffer.write("RIFF", 0);
-    buffer.writeUInt32LE(36 + samples * 2, 4);
-    buffer.write("WAVEfmt ", 8);
-    buffer.writeUInt32LE(16, 16);
-    buffer.writeUInt16LE(1, 20);
-    buffer.writeUInt16LE(1, 22);
-    buffer.writeUInt32LE(sampleRate, 24);
-    buffer.writeUInt32LE(sampleRate * 2, 28);
-    buffer.writeUInt16LE(2, 32);
-    buffer.writeUInt16LE(16, 34);
-    buffer.write("data", 36);
-    buffer.writeUInt32LE(samples * 2, 40);
+    const sampleRate   = 44100;    // 44.1 kHz
+    const durationSec  = 1;        // 1 секунда
+    const numChannels  = 1;        // моно
+    const bitsPerSample = 16;
+    const numSamples   = sampleRate * durationSec;
 
-    // Audio data
-    let offset = 44;
-    for (let i = 0; i < samples; i++) {
+    const byteRate  = sampleRate * numChannels * (bitsPerSample / 8);
+    const blockAlign = numChannels * (bitsPerSample / 8);
+    const dataSize  = numSamples * numChannels * (bitsPerSample / 8);
+    const fileSize  = 44 + dataSize;
+
+    const buffer = Buffer.alloc(fileSize);
+
+    // ---- WAV header ----
+    let offset = 0;
+    buffer.write("RIFF", offset); offset += 4;
+    buffer.writeUInt32LE(36 + dataSize, offset); offset += 4; // file size - 8
+    buffer.write("WAVE", offset); offset += 4;
+
+    buffer.write("fmt ", offset); offset += 4;
+    buffer.writeUInt32LE(16, offset); offset += 4;            // subchunk size
+    buffer.writeUInt16LE(1, offset); offset += 2;             // PCM
+    buffer.writeUInt16LE(numChannels, offset); offset += 2;
+    buffer.writeUInt32LE(sampleRate, offset); offset += 4;
+    buffer.writeUInt32LE(byteRate, offset); offset += 4;
+    buffer.writeUInt16LE(blockAlign, offset); offset += 2;
+    buffer.writeUInt16LE(bitsPerSample, offset); offset += 2;
+
+    buffer.write("data", offset); offset += 4;
+    buffer.writeUInt32LE(dataSize, offset); offset += 4;
+
+    // ---- PCM data ----
+    // Дет. частота зависит только от seed и index
+    const baseFreq = 220; // A3
+    const step     = 55;  // шаг по частоте
+    const variant  = (seed * 31 + index * 17) % 5; // 0..4
+    const freq     = baseFreq + variant * step;
+
+    const amplitude = 0.3; // чтобы не клиппило
+
+    for (let i = 0; i < numSamples; i++) {
         const t = i / sampleRate;
-        const sample = Math.sin(2 * Math.PI * frequency * t);
-        buffer.writeInt16LE(sample * 32767, offset);
+        const sample = Math.sin(2 * Math.PI * freq * t); // -1..1
+        const s = Math.max(-1, Math.min(1, sample * amplitude));
+        const intSample = Math.round(s * 32767);         // 16-bit PCM
+
+        buffer.writeInt16LE(intSample, offset);
         offset += 2;
     }
 
-    return buffer;
-}
-
-
-const app = express();
-app.use(cors());
-
-app.get('/audio', (req, res) => {
-    const seed = parseInt(req.query.seed || "1");
-    const index = parseInt(req.query.index || "1");
-
-    const audio = generateWavAudio(seed, index);
-
     res.setHeader("Content-Type", "audio/wav");
-    res.send(audio);
+    res.setHeader("Cache-Control", "no-cache");
+
+    res.send(buffer);
 });
 
-
-app.listen(4000, () => {
-    console.log("Audio server running on http://localhost:4000");
+app.listen(PORT, "0.0.0.0", () => {
+    console.log(`Audio server running on port ${PORT} (WAV)`);
 });

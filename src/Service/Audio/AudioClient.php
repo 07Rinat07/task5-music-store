@@ -2,14 +2,23 @@
 
 namespace App\Service\Audio;
 
-final class AudioClient
+class AudioClient
 {
-    public function __construct(
-        private string $baseUrl = 'http://localhost:4000'
-    ) {}
+    private string $baseUrl;
+
+    public function __construct(string $baseUrl)
+    {
+        // Убираем финальный / если есть
+        $this->baseUrl = rtrim($baseUrl, '/');
+    }
 
     public function getAudioUrl(int $seed, int $index): string
     {
-        return "{$this->baseUrl}/audio?seed={$seed}&index={$index}";
+        return sprintf(
+            '%s/audio?seed=%d&index=%d',
+            $this->baseUrl,
+            $seed,
+            $index
+        );
     }
 }

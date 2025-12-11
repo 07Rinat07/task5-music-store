@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Songs List{% endblock %}
+
+{% block body %}
+    <h1>Songs</h1>
+
+    <div id="songsContainer"></div>
+
+    <script src="/js/app.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            loadSongs(true); // true = режим списка
+        });
+    </script>
+{% endblock %}

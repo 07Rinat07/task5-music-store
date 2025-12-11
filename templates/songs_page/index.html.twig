@@ -6,43 +6,51 @@
     <div class="container" style="max-width: 700px; margin-top: 40px;">
 
         <a href="/" style="
-            display: inline-block;
-            margin-bottom: 20px;
-            padding: 8px 14px;
-            background: #007bff;
-            color: white;
-            text-decoration: none;
-            border-radius: 6px;
-        ">
-            ← Back to Songs
+        display: inline-block;
+        margin-bottom: 20px;
+        padding: 8px 14px;
+        background: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+    ">
+            ← Back
         </a>
 
         <h1>Song #{{ index }}</h1>
 
-        <div id="songDetails">
-            Loading...
-        </div>
+        <div id="songDetails">Loading...</div>
     </div>
 
     <script>
         async function loadSong() {
-            const res = await fetch("/api/songs/details/{{ index }}");
-            const data = await res.json();
+            const response = await fetch("/api/songs/details/{{ index }}");
+            const data = await response.json();
 
             document.getElementById('songDetails').innerHTML = `
-                <h2>${data.title}</h2>
+        <h2>${data.title}</h2>
 
-                <img src="${data.coverUrl}" width="300"
-                     style="margin: 20px 0; border-radius: 10px; display: block;">
+        <img src="${data.coverUrl}" width="300"
+             style="margin: 20px 0; border-radius: 10px; display: block;">
 
-                <p><b>Artist:</b> ${data.artist}</p>
-                <p><b>Album:</b> ${data.album}</p>
-                <p><b>Genre:</b> ${data.genre}</p>
-                <p><b>Review:</b> ${data.review}</p>
+        <p><b>Artist:</b> ${data.artist}</p>
+        <p><b>Album:</b> ${data.album}</p>
+        <p><b>Genre:</b> ${data.genre}</p>
+        <p><b>Review:</b> ${data.review}</p>
 
-                <h3>Audio Preview</h3>
-                <audio controls src="${data.audioUrl}" style="width: 100%;"></audio>
-            `;
+        <h3>Audio Preview</h3>
+        <audio id="player" controls style="width:100%;">
+            <source src="${data.audioUrl}" type="audio/mpeg">
+        </audio>
+    `;
+
+            // Критично: ждём, пока элемент вставится в DOM
+            const player = document.getElementById('player');
+
+            // Принудительная загрузка аудио
+            player.load();
+
+            console.log("Audio URL:", data.audioUrl);
         }
 
         document.addEventListener("DOMContentLoaded", loadSong);

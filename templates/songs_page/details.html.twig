@@ -1,0 +1,19 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Song Details{% endblock %}
+
+{% block body %}
+    <a href="/songs">← Back to list</a>
+
+    <h1>Song #{{ index }}</h1>
+
+    <div id="detailsContainer"></div>
+
+    <script src="/js/app.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            loadDetails({{ index }});   // ← ГЛАВНОЕ!
+        });
+    </script>
+{% endblock %}
