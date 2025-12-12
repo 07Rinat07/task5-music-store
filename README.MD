@@ -80,5 +80,97 @@ PHP-расширения	gd, pdo_pgsql, mbstring, др.
 * VPS (Hetzner / DigitalOcean / AWS / Render)
 
 #### Требуется только установленный Docker.
-📬 Контакты
-* ura07srr@gmail.com
+
+## ✅ ИНСТРУКЦИЯ: Как развернуть Task5-Music-Store на VPS
+
+* Ниже — единственный корректный, протестированный алгоритм, на облачном сервере.
+#### 1. Установить системные зависимости
+* apt update
+* apt upgrade -y
+* apt install -y curl git nano unzip
+#### 2. Установить Docker
+* curl -fsSL https://get.docker.com | sh
+*  systemctl enable docker
+* systemctl start docker
+* docker --version
+
+#### 3. Установить Docker Compose Plugin
+* apt install -y docker-compose-plugin
+*  docker compose version
+#### 4. Подготовить директорию для проекта
+* mkdir -p /var/www/task5-music-store
+* cd /var/www/task5-music-store
+#### 5. Склонировать проект (или загрузить)
+* Если Git доступен:
+
+git clone https://github.com/USER/task5-music-store.git .
+
+
+Если архив:
+
+unzip task5-music-store.zip -d 
+#### 6. Выставить правильные права
+* Очень важно для Nginx и PHP-FPM Docker-контейнеров:
+
+* chown -R root:www-data /var/www/task5-music-store
+* chmod -R 755 /var/www/task5-music-store
+####  7. Проверить и отредактировать .env
+* Открыть файл:
+
+nano .env
+
+
+Нужные значения:
+
+APP_ENV=prod
+AUDIO_SERVER_URL=http://SERVER_IP:4000
+DATABASE_URL="postgresql://app:!ChangeMe!@db:5432/app?serverVersion=16&charset=utf8"
+
+
+Где SERVER_IP — внешний IP VPS.
+у меня к примеру был этот: 37.140.243.106
+#### 8. Отредактировать compose.yaml
+* Это критично.
+*  В разделе php: в compose.yaml должно быть:
+
+* environment:
+* AUDIO_SERVER_URL: "http://SERVER_IP:4000"
+* У меня было:
+* а исправил на AUDIO_SERVER_URL: "http://37.140.243.106:4000"
+* Это обязательно, чтобы плеер работал.
+
+#### 9. Свободный порт 5432 (PostgreSQL)
+* Если на сервере установлен PostgreSQL в системе, нужно отключить:
+
+* systemctl stop postgresql
+* systemctl disable postgresql
+* Именно из-за этого была ошибка:
+* address already in use 5432.
+#### 10. Запуск проекта
+* docker compose up -d --build
+* Проверка: 
+* docker compose ps
+#### 11. Проверка доступности API
+* Музыка:
+* curl -I http://YOUR_IP:4000/audio?seed=1&index=5
+* Детальная песня:
+* curl http://YOUR_IP:8080/api/songs/details/5
+#### 12. Проверка сайта в браузере
+* Открыть:
+* http://YOUR_IP:8080
+
+#### 13. Обновление проекта
+* Если сделал изменения и хочешь пересобрать контейнеры:
+* docker compose down
+* docker compose up -d --build
+#### ИТОГ-обзор
+ * ✔ VPS с Docker и Docker Compose
+ * ✔ Скачан проект в /var/www/task5-music-store
+ * ✔ Правильные права доступа
+ * ✔ В .env правильный AUDIO_SERVER_URL
+ * ✔ В compose.yaml правильный AUDIO_SERVER_URL
+ * ✔ Остановлен системный PostgreSQL (если порт 5432 занят)
+ * ✔ Команда запуска: docker compose up -d --build
+ * ✔ Открыты порты 8080 и 4000
+ * ✔ API отвечает
+ * ✔ Плеер работает
